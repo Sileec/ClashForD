@@ -67,7 +67,7 @@ function main(config) {
         icon: AUTO_ICON,
         proxies: matched,
         url: "http://www.gstatic.com/generate_204",
-        interval: 900,
+        interval: 7200,
         tolerance: 50
       };
       groups.push(g);
@@ -111,9 +111,9 @@ function main(config) {
   var hasAutos = existingAutos.length > 0;
   if (hasAutos) {
     upsertGroup("APNs-Fallback", "fallback", existingAutos.slice(),
-      "http://captive.apple.com/hotspot-detect.html", 300);
+      "http://captive.apple.com/hotspot-detect.html", 900);
     upsertGroup("🌍 Global-Fallback", "fallback", existingAutos.slice(),
-      "http://www.gstatic.com/generate_204", 600);
+      "http://www.gstatic.com/generate_204", 1800);
   }
 
   // ---- 3. 选项注入（幂等） ----
