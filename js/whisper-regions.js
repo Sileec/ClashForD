@@ -1,11 +1,12 @@
 /*
- * 地区分组脚本（极简版）｜Used for ClashbyClash
+ * 地区分组脚本（极简版）｜Hako
  *
  * 职责（只做动态部分，不碰 Rules / DNS / TUN）：
  *  1. 按节点名正则划分地区，生成地区 Auto 组（url-test）
- *  2. 节点少于2个不自动生成地区 Auto 组
- *  2. 生成 APNs-Fallback / 🌍 Global-Fallback（依赖地区组）
- *  3. 把已存在的地区组插入 PROXY-Gate / Apple Push / 服务策略组的选项
+ *  2. 生成 US-Manual / US-Meta / EUR-Manual（select，复用同地区成员）
+ *  3. 生成 APNs-Fallback / 🌍 Global-Fallback（依赖地区组）
+ *  4. 按每组精选表把地区选项插入 PROXY-Gate / 服务策略组
+ *     （Apple Push 为静态 fallback，脚本不碰）
  *
  * 配合 whisper-scheme.yaml（规则方案）使用：
  *  - 应用顺序：规则方案先，脚本后（Hako 按"规则方案 → 覆写脚本"顺序）
@@ -57,7 +58,7 @@ function main(config) {
   var existingAutos = [];
   regionGroups.forEach(function (r) {
     var matched = names.filter(function (n) { return r.filter.test(n); });
-    if (matched.length < 2) return;
+    if (matched.length < 1) return;
     var autoName = r.name + "-Auto";
     if (!byName[autoName]) {
       var g = {
@@ -77,7 +78,30 @@ function main(config) {
     existingAutos.push(autoName);
   });
 
-  // ---- 2. APNs-Fallback / Global-Fallback ----
+  function upsertGroupLater(name, type, proxies, icon) {
+    if (byName[name]) { byName[name].proxies = proxies; return; }
+    var g = { name: name, type: type, proxies: proxies };
+    if (icon) g.icon = icon;
+    groups.push(g);
+    byName[name] = g;
+  }
+
+  // ---- 2. Manual / Meta / EUR 组 ----
+  var usAuto = byName["🇺🇸 US-Auto"];
+  if (usAuto) {
+    upsertGroupLater("🇺🇸 US-Manual", "select", usAuto.proxies.slice(),
+      "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/United_States.png");
+    upsertGroupLater("🇺🇸 US-Meta", "select", usAuto.proxies.slice(),
+      "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/United_States.png");
+  }
+  var eurMembers = ["🇬🇧 UK-Auto", "🇩🇪 DE-Auto", "🇫🇷 FR-Auto"]
+    .filter(function (n) { return byName[n]; });
+  if (eurMembers.length) {
+    upsertGroupLater("🗺️ EUR-Manual", "select", eurMembers,
+      "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Europe_Map.png");
+  }
+
+  // ---- 3. APNs-Fallback / Global-Fallback ----
   function upsertGroup(name, type, proxies, url, interval) {
     if (byName[name]) { byName[name].proxies = proxies; return; }
     var g = { name: name, type: type, proxies: proxies, url: url, interval: interval };
@@ -93,7 +117,8 @@ function main(config) {
   }
 
   // ---- 3. 选项注入（幂等） ----
-  var DYNAMIC = ["🌍 Global-Fallback", "APNs-Fallback"].concat(
+  var DYNAMIC = ["🌍 Global-Fallback", "APNs-Fallback",
+    "🇺🇸 US-Manual", "🇺🇸 US-Meta", "🗺️ EUR-Manual"].concat(
     regionGroups.map(function (r) { return r.name + "-Auto"; })
   );
   function stripDynamic(list) {
@@ -122,18 +147,47 @@ function main(config) {
     g.proxies = list;
   }
 
-  var regionInserts = hasAutos ? ["🌍 Global-Fallback"].concat(existingAutos) : [];
+  function exists(n) { return byName[n] ? n : null; }
+  function pick(list) {
+    return list.map(exists).filter(Boolean);
+  }
 
-  // PROXY-Gate: [🖥️ All-Nodes, 🌍 Auto, (Global-Fallback, 地区Auto...), DIRECT]
-  injectAfter("PROXY-Gate", "🌍 Auto", regionInserts);
-  // Apple Push: [(APNs-Fallback), 🌍 Auto, 🖥️ All-Nodes, DIRECT]
-  if (hasAutos) injectBefore("Apple Push", "🌍 Auto", ["APNs-Fallback"]);
-  // 服务组: [🖥️ All-Nodes, 🌍 Auto, (Global-Fallback, 地区Auto...), PROXY-Gate, DIRECT]
+  // 每组精选地区（只注入存在的组；不在表的用 DEFAULT）
+  var DEFAULT_REGIONS = ["🇺🇸 US-Auto", "🇸🇬 SG-Auto", "🇭🇰 HK-Auto",
+    "🇯🇵 JP-Auto", "🇹🇼 TW-Auto", "🗺️ EUR-Manual"];
+  var AI_REGIONS = ["🇺🇸 US-Auto", "🇺🇸 US-Manual", "🇸🇬 SG-Auto",
+    "🇭🇰 HK-Auto", "🇯🇵 JP-Auto", "🇹🇼 TW-Auto", "🗺️ EUR-Manual"];
+  var CURATED = {
+    "Apple": ["🇺🇸 US-Auto", "🇺🇸 US-Manual"],
+    "X": ["🇺🇸 US-Auto", "🇺🇸 US-Manual"],
+    "Meta": ["🇺🇸 US-Auto", "🇺🇸 US-Meta"],
+    "Threads": ["🇺🇸 US-Auto", "🇺🇸 US-Meta"],
+    "GPT": AI_REGIONS,
+    "Gemini": AI_REGIONS,
+    "Grok": AI_REGIONS,
+    "Microsoft": [],
+    "OneDrive": [],
+    "Outlook": []
+  };
+
+  // PROXY-Gate: [🖥️ All-Nodes, 🌍 Auto, (Global-Fallback, EUR, US/SG/HK/JP/TW...), DIRECT]
+  if (hasAutos) {
+    injectAfter("PROXY-Gate", "🌍 Auto",
+      ["🌍 Global-Fallback"].concat(pick(DEFAULT_REGIONS)));
+  }
+  // 服务组: [🖥️ All-Nodes, 🌍 Auto, (Global-Fallback, 精选地区...), PROXY-Gate, DIRECT]
+  // Apple Push 为静态 fallback，脚本不注入
   var serviceNames = ["YouTube", "Netflix", "Disney+", "Emby", "Spotify",
     "TikTok", "Twitch", "GPT", "Gemini", "Claude", "Grok", "Microsoft",
     "Google", "Apple", "iCloud", "Amazon", "Meta", "X", "Threads", "WhatsApp",
-    "Telegram", "Github", "Speedtest"];
-  serviceNames.forEach(function (n) { injectAfter(n, "🌍 Auto", regionInserts); });
+    "Telegram", "Github", "Speedtest", "OneDrive", "Outlook"];
+  serviceNames.forEach(function (n) {
+    if (!hasAutos) return;
+    var list = Object.prototype.hasOwnProperty.call(CURATED, n)
+      ? CURATED[n] : DEFAULT_REGIONS;
+    injectAfter(n, "🌍 Auto",
+      ["🌍 Global-Fallback"].concat(pick(list)));
+  });
 
   return config;
 }
