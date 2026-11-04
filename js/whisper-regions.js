@@ -114,6 +114,9 @@ function main(config) {
       "http://captive.apple.com/hotspot-detect.html", 900);
     upsertGroup("🌍 Global-Fallback", "fallback", existingAutos.slice(),
       "http://www.gstatic.com/generate_204", 43200);
+    // Apple Push: inline region autos directly (Hako drops nested fallback refs)
+    var applePush = byName["Apple Push"];
+    if (applePush) applePush.proxies = ["Apple"].concat(existingAutos, ["DIRECT"]);
   }
 
   // ---- 3. 选项注入（幂等） ----
