@@ -89,7 +89,6 @@ proxy-groups:
   icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Apple.png
   proxies:
   - Apple
-  - APNs-Fallback
   - DIRECT
   url: http://captive.apple.com/hotspot-detect.html
   interval: 900
