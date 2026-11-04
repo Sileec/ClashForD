@@ -113,7 +113,7 @@ function main(config) {
     upsertGroup("APNs-Fallback", "fallback", existingAutos.slice(),
       "http://captive.apple.com/hotspot-detect.html", 900);
     upsertGroup("🌍 Global-Fallback", "fallback", existingAutos.slice(),
-      "http://www.gstatic.com/generate_204", 1800);
+      "http://www.gstatic.com/generate_204", 43200);
   }
 
   // ---- 3. 选项注入（幂等） ----
