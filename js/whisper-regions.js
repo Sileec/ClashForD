@@ -1,8 +1,9 @@
 /*
- * 地区分组脚本（极简版）｜Hako
+ * 地区分组脚本（极简版）｜Used for ClashbyClash
  *
  * 职责（只做动态部分，不碰 Rules / DNS / TUN）：
  *  1. 按节点名正则划分地区，生成地区 Auto 组（url-test）
+ *  2. 节点少于2个不自动生成地区 Auto 组
  *  2. 生成 APNs-Fallback / 🌍 Global-Fallback（依赖地区组）
  *  3. 把已存在的地区组插入 PROXY-Gate / Apple Push / 服务策略组的选项
  *
@@ -56,7 +57,7 @@ function main(config) {
   var existingAutos = [];
   regionGroups.forEach(function (r) {
     var matched = names.filter(function (n) { return r.filter.test(n); });
-    if (matched.length < 1) return;
+    if (matched.length < 2) return;
     var autoName = r.name + "-Auto";
     if (!byName[autoName]) {
       var g = {
