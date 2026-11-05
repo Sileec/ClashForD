@@ -66,7 +66,7 @@ function main(config) {
         type: "url-test",
         icon: AUTO_ICON,
         proxies: matched,
-        url: "http://www.gstatic.com/generate_204",
+        url: "https://www.gstatic.com/generate_204",
         interval: 7200,
         tolerance: 50
       };
@@ -111,9 +111,9 @@ function main(config) {
   var hasAutos = existingAutos.length > 0;
   if (hasAutos) {
     upsertGroup("APNs-Fallback", "fallback", existingAutos.slice(),
-      "http://captive.apple.com/hotspot-detect.html", 900);
+      "https://captive.apple.com/hotspot-detect.html", 900);
     upsertGroup("🌍 Global-Fallback", "fallback", existingAutos.slice(),
-      "http://www.gstatic.com/generate_204", 43200);
+      "https://www.gstatic.com/generate_204", 43200);
     // Apple Push: inline region autos directly (Hako drops nested fallback refs)
     var applePush = byName["Apple Push"];
     if (applePush) applePush.proxies = ["Apple"].concat(existingAutos, ["DIRECT"]);
