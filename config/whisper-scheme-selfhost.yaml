@@ -9,6 +9,9 @@ tun:
   auto-route: true
   auto-detect-interface: true
   strict-route: true
+  # 回环：供 AltLoad/SideStore 连回本机（10.7.0.1:49152），2026-11-09
+  loopback-address:
+  - 10.7.0.1
   dns-hijack:
   - any:53
 dns:
