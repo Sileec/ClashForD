@@ -266,21 +266,6 @@ proxy-groups:
   - 🌍 Auto
   - PROXY-Gate
   - DIRECT
-- name: Threads
-  type: select
-  proxies:
-  - 🖥️ All-Nodes
-  - 🌍 Auto
-  - PROXY-Gate
-  - DIRECT
-- name: WhatsApp
-  type: select
-  icon: https://raw.githubusercontent.com/kiki-rgb-00/kiki/refs/heads/main/Ti/WhatsApp.svg
-  proxies:
-  - 🖥️ All-Nodes
-  - 🌍 Auto
-  - PROXY-Gate
-  - DIRECT
 - name: Telegram
   type: select
   icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Telegram.png
@@ -454,13 +439,12 @@ rules:
 - RULE-SET,Apple_Domain,Apple
 - RULE-SET,Amazon_Domain,Amazon
 - RULE-SET,Google_Domain,Google
-- DOMAIN-SUFFIX,whatsapp.com,WhatsApp
-- DOMAIN-SUFFIX,whatsapp.net,WhatsApp
-- DOMAIN-SUFFIX,wa.me,WhatsApp
-- DOMAIN-SUFFIX,whatsapp.org,WhatsApp
-- DOMAIN-SUFFIX,whatsapp.biz,WhatsApp
-- DOMAIN-SUFFIX,whatsapp.info,WhatsApp
-- DOMAIN,graph.facebook.com,WhatsApp
+- DOMAIN-SUFFIX,whatsapp.com,Meta
+- DOMAIN-SUFFIX,whatsapp.net,Meta
+- DOMAIN-SUFFIX,wa.me,Meta
+- DOMAIN-SUFFIX,whatsapp.org,Meta
+- DOMAIN-SUFFIX,whatsapp.biz,Meta
+- DOMAIN-SUFFIX,whatsapp.info,Meta
 - DOMAIN-SUFFIX,facebook.com,Meta
 - DOMAIN-SUFFIX,facebook.net,Meta
 - DOMAIN-SUFFIX,fbcdn.net,Meta
@@ -476,7 +460,7 @@ rules:
 - DOMAIN-SUFFIX,cdninstagram.com,Meta
 - DOMAIN-SUFFIX,instagram.net,Meta
 - DOMAIN-SUFFIX,ig.me,Meta
-- RULE-SET,Threads_Domain,Threads
+- RULE-SET,Threads_Domain,Meta
 - DOMAIN-SUFFIX,messenger.com,Meta
 - DOMAIN-SUFFIX,m.me,Meta
 - DOMAIN-SUFFIX,meta.ai,Meta
