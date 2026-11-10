@@ -331,19 +331,12 @@ rules:
 - DOMAIN-SUFFIX,crl.apple.com,REJECT
 - DOMAIN-SUFFIX,certs.apple.com,REJECT
 - DOMAIN-SUFFIX,valid.apple.com,REJECT
-# Apple Intelligence / Siri / 中继：强制走 Apple 组，配合改 region 用；截图与 ddgksf2013 两份清单并集 12 条
+# Apple Intelligence / Siri：强制走 Apple 组，配合改 region 用
 - DOMAIN-SUFFIX,api-siri-prod.apple.com,Apple
 - DOMAIN-SUFFIX,guzzoni.apple.com,Apple
 - DOMAIN-SUFFIX,smoot.apple.com,Apple
 - DOMAIN-SUFFIX,gspe1-ssl.ls.apple.com,Apple
 - DOMAIN-SUFFIX,cp4.cloudflare.com,Apple
-- DOMAIN-SUFFIX,gateway.icloud.com,Apple
-- DOMAIN-SUFFIX,apple-relay.apple.com,Apple
-- DOMAIN-SUFFIX,apple-relay.mask.apple-dns.net,Apple
-- DOMAIN-SUFFIX,apple-relay.cloudflare.com,Apple
-- DOMAIN-SUFFIX,apple-relay.fastly-edge.com,Apple
-- DOMAIN-SUFFIX,apple-relay.akamaiedge.net,Apple
-- DOMAIN-SUFFIX,apple-relay.akamaized.net,Apple
 # 以下规则为广告规则集误匹配，因此需放在广告规则集之前
 - DOMAIN,hatch.metaaivm.com,Meta
 - RULE-SET,AdvertisingLite,REJECT
@@ -448,6 +441,14 @@ rules:
 - DOMAIN,metrics.icloud.com,iCloud
 - DOMAIN-SUFFIX,apple-dns.net,iCloud
 - DOMAIN-KEYWORD,icloud.com.akadns.net,iCloud
+# Private Relay 中继：走 iCloud 组
+- DOMAIN-SUFFIX,gateway.icloud.com,iCloud
+- DOMAIN-SUFFIX,apple-relay.apple.com,iCloud
+- DOMAIN-SUFFIX,apple-relay.mask.apple-dns.net,iCloud
+- DOMAIN-SUFFIX,apple-relay.cloudflare.com,iCloud
+- DOMAIN-SUFFIX,apple-relay.fastly-edge.com,iCloud
+- DOMAIN-SUFFIX,apple-relay.akamaiedge.net,iCloud
+- DOMAIN-SUFFIX,apple-relay.akamaized.net,iCloud
 - RULE-SET,iCloud,iCloud
 - RULE-SET,Apple,Apple
 - RULE-SET,Apple_Domain,Apple
