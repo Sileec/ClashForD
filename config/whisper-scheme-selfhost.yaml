@@ -87,6 +87,11 @@ proxy-groups:
   - 🖥️ All-Nodes
   - 🌍 Auto
   - DIRECT
+- name: tailnet
+  type: select
+  proxies:
+  - Tailscale
+  - DIRECT
 - name: Apple Push
   type: fallback
   icon: https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Apple.png
@@ -296,6 +301,8 @@ rules:
 - IP-CIDR,172.16.0.0/12,DIRECT,no-resolve
 - IP-CIDR,127.0.0.0/8,DIRECT,no-resolve
 - GEOIP,LAN,DIRECT,no-resolve
+- IP-CIDR,100.64.0.0/10,tailnet,no-resolve
+- DOMAIN-SUFFIX,ts.net,tailnet
 - DOMAIN-SUFFIX,push.apple.com,Apple Push
 - DOMAIN-SUFFIX,push-apple.com.akadns.net,Apple Push
 - DOMAIN-KEYWORD,apple.com.edgekey.net,Apple Push
