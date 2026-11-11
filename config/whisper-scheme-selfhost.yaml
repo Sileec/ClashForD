@@ -79,6 +79,20 @@ dns:
 profile:
   store-selected: true
   store-fake-ip: true
+proxies:
+  - name: Tailscale-Air
+    type: tailscale
+    hostname: clash-air
+    accept-routes: true
+    udp: true
+    state-dir: tailscale-air
+  - name: Tailscale-Mini
+    type: tailscale
+    hostname: clash-mini
+    accept-routes: true
+    udp: true
+    state-dir: tailscale-mini
+
 proxy-groups:
 - name: PROXY-Gate
   type: select
@@ -90,7 +104,8 @@ proxy-groups:
 - name: tailnet
   type: select
   proxies:
-  - Tailscale
+  - Tailscale-Air
+  - Tailscale-Mini
   - DIRECT
 - name: Apple Push
   type: fallback
