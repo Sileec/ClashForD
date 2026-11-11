@@ -324,6 +324,7 @@ rules:
 - DOMAIN-SUFFIX,cp4.cloudflare.com,Apple
 # 以下规则为广告规则集误匹配，因此需放在广告规则集之前
 - DOMAIN,hatch.metaaivm.com,Meta
+- DOMAIN,statsig.anthropic.com,Claude
 - RULE-SET,AdvertisingLite,REJECT
 - RULE-SET,AdvertisingLite_Domain,REJECT
 - RULE-SET,Privacy,REJECT
