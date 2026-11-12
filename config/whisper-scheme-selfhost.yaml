@@ -79,20 +79,6 @@ dns:
 profile:
   store-selected: true
   store-fake-ip: true
-proxies:
-  - name: Tailscale-Air
-    type: tailscale
-    hostname: clash-air
-    accept-routes: true
-    udp: true
-    state-dir: tailscale-air
-  - name: Tailscale-Mini
-    type: tailscale
-    hostname: clash-mini
-    accept-routes: true
-    udp: true
-    state-dir: tailscale-mini
-
 proxy-groups:
 - name: PROXY-Gate
   type: select
