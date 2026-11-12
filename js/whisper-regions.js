@@ -192,5 +192,29 @@ function main(config) {
       ["🌍 Global-Fallback"].concat(pick(list)));
   });
 
+  // ---- 4. Tailscale 节点注入 + tailnet 组修复 ----
+  // App 合并节点来源时会冲掉 scheme 文件里静态定义的 proxies，
+  // tailnet 组因此丢了两个 Tailscale 成员、被补上 include-all。
+  // 覆写脚本最后跑，在这里补回节点并把组改回三成员（幂等）。
+  // yaml 里已删掉静态 proxies 段，节点定义只留在这里；
+  // 若 config.proxies 不存在（未选节点来源），先把它接回本数组。
+  config.proxies = proxies;
+  function ensureProxy(def) {
+    if (names.indexOf(def.name) === -1) {
+      proxies.push(def);
+      names.push(def.name);
+    }
+  }
+  ensureProxy({ name: "Tailscale-Air", type: "tailscale", hostname: "clash-air",
+    "accept-routes": true, udp: true, "state-dir": "tailscale-air" });
+  ensureProxy({ name: "Tailscale-Mini", type: "tailscale", hostname: "clash-mini",
+    "accept-routes": true, udp: true, "state-dir": "tailscale-mini" });
+  var tailnet = byName["tailnet"];
+  if (tailnet) {
+    tailnet.proxies = ["Tailscale-Air", "Tailscale-Mini", "DIRECT"];
+    delete tailnet["include-all"];
+    delete tailnet["include-all-proxies"];
+  }
+
   return config;
 }
