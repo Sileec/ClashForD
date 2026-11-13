@@ -1,27 +1,27 @@
 # NAME: Privacy
-# AUTHOR: blackmatrix7
-# REPO: https://github.com/blackmatrix7/ios_rule_script
-# UPDATED: 2025-12-08 02:06:17
-# DOMAIN: 19
-# DOMAIN-KEYWORD: 9
-# DOMAIN-SUFFIX: 39897
-# IP-CIDR: 11
-# TOTAL: 39936
+# AUTHOR: Sileec/ClashForD (self-aggregated)
+# UPDATED: 2026-11-13 13:32:20
+# SOURCES: BanEasyPrivacy.list, reject-drop.conf, reject-no-drop.conf
+# DOMAIN: 11
+# DOMAIN-KEYWORD: 2
+# DOMAIN-SUFFIX: 39888
+# DOMAIN-WILDCARD: 8
+# IP-CIDR: 9
+# TOTAL: 39918
 payload:
-  - DOMAIN-KEYWORD,analytics.
-  - DOMAIN-KEYWORD,app-analytics
-  - DOMAIN-KEYWORD,app-log.
-  - DOMAIN-KEYWORD,applog.
-  - DOMAIN-KEYWORD,fzlm
-  - DOMAIN-KEYWORD,ios-log.
-  - DOMAIN-KEYWORD,ioslog.
-  - DOMAIN-KEYWORD,pc-log.
-  - DOMAIN-KEYWORD,pclog.
+  - DOMAIN-KEYWORD,-p2p-v2.pull.yximgs.com
+  - DOMAIN-KEYWORD,-p2p.pull.yximgs.com
+  - DOMAIN-WILDCARD,dyp2p-*.douyucdn.cn
+  - DOMAIN-WILDCARD,f-log*.grammarly.io
+  - DOMAIN-WILDCARD,p2p*.qq.com
+  - DOMAIN-WILDCARD,p2p-*.douyucdn.cn
+  - DOMAIN-WILDCARD,p2pchunk-*.douyucdn.cn
+  - DOMAIN-WILDCARD,p2plive-*.douyucdn.cn
+  - DOMAIN-WILDCARD,stun*.douyucdn.cn
+  - DOMAIN-WILDCARD,upos-sz-302*.bilivideo.com
   - IP-CIDR,0.0.0.1/32
   - IP-CIDR,109.123.233.251/32
-  - IP-CIDR,157.148.47.204/32
   - IP-CIDR,185.193.38.148/32
-  - IP-CIDR,219.143.187.136/32
   - IP-CIDR,34.215.155.61/32
   - IP-CIDR,35.194.26.233/32
   - IP-CIDR,35.239.57.233/32
