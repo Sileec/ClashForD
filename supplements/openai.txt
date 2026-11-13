@@ -1,0 +1,23 @@
+# OpenAI supplement: BM7 entries missing from geosite openai, kept deliberately.
+# Third-party dependencies used by OpenAI's web apps (auth, analytics, payments,
+# feature flags) that geosite openai does not include; user decision (2026-11-13)
+# restores them. Note: several are broad shared domains (stripe.com, sentry.io,
+# segment.io, intercom.io, auth0.com, algolia.net) — routing them to the GPT group
+# preserves the pre-switch BM7 behaviour.
++.ai.com
++.algolia.net
++.api.statsig.com
++.auth0.com
++.client-api.arkoselabs.com
++.events.statsigapi.net
++.featuregates.org
++.identrust.com
++.intercom.io
++.intercomcdn.com
++.launchdarkly.com
++.observeit.net
++.segment.io
++.sentry.io
++.stripe.com
+openai-api.arkoselabs.com
+static.cloudflareinsights.com
