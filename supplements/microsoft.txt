@@ -1,0 +1,3 @@
+# Microsoft supplement: BM7 entries missing from geosite microsoft + geosite linkedin.
+# 1drv.ms is OneDrive's short-link domain.
++.1drv.ms
