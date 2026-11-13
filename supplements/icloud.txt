@@ -1,0 +1,12 @@
+# iCloud supplement: BM7 entries missing from geosite icloud, kept deliberately.
+# cdn-apple.com is shared Apple CDN; user decision (2026-11-10) routes it to iCloud group.
+# Others are iCloud-adjacent Apple services (CloudKit, iWork, icloud.apple.com).
++.apple-cloudkit.com
++.apple-livephotoskit.com
++.apzones.com
++.cdn-apple.com
++.gc.apple.com
++.icloud.apple.com
++.icloud.cn
++.iwork.apple.com
++.www-cdn.icloud.com.akadns.net
