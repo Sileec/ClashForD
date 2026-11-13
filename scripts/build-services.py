@@ -13,14 +13,15 @@ Inputs:
 
 Mapping (geosite -> our file):
   Direct copies (MRS used as-is):
-    apple, netflix, tiktok, youtube, spotify, amazon, google, openai,
-    category-emby -> Apple_Domain, Netflix_Domain, TikTok_Domain,
-    YouTube_Domain, Spotify_Domain, Amazon_Domain, Google_Domain,
-    OpenAI_Domain, Emby
+    apple, netflix, youtube, spotify, amazon, google,
+    category-emby -> Apple_Domain, Netflix_Domain,
+    YouTube_Domain, Spotify_Domain, Amazon_Domain, Google_Domain, Emby
   Merges (MRS -> text -> merge + supplement -> dedup -> MRS):
     Microsoft.mrs = geosite/microsoft + geosite/linkedin + microsoft.txt
     iCloud.mrs    = geosite/icloud + icloud.txt
     Threads_Domain.mrs = geosite/threads + threads.txt
+    TikTok_Domain.mrs = geosite/tiktok + tiktok.txt
+    OpenAI_Domain.mrs = geosite/openai + openai.txt
 
 Frozen (NOT touched by this script; files stay in rules/ as-is):
   Apple.yaml (classical: keywords + IPs incl. 17.0.0.0/8, stable),
@@ -46,12 +47,10 @@ from pathlib import Path
 DIRECT = {
     "apple": "Apple_Domain.mrs",
     "netflix": "Netflix_Domain.mrs",
-    "tiktok": "TikTok_Domain.mrs",
     "youtube": "YouTube_Domain.mrs",
     "spotify": "Spotify_Domain.mrs",
     "amazon": "Amazon_Domain.mrs",
     "google": "Google_Domain.mrs",
-    "openai": "OpenAI_Domain.mrs",
     "category-emby": "Emby.mrs",
 }
 
@@ -60,6 +59,8 @@ MERGES = {
     "Microsoft.mrs": (["microsoft", "linkedin"], "microsoft.txt"),
     "iCloud.mrs": (["icloud"], "icloud.txt"),
     "Threads_Domain.mrs": (["threads"], "threads.txt"),
+    "TikTok_Domain.mrs": (["tiktok"], "tiktok.txt"),
+    "OpenAI_Domain.mrs": (["openai"], "openai.txt"),
 }
 
 
