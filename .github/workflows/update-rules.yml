@@ -1,14 +1,34 @@
 # ============================================================
 # Phase 1：kiki 同层级——从 blackmatrix7 抓源，本地转 MRS
 #
-# 链条：blackmatrix7/ios_rule_script（上游）
+# 链条：blackmatrix7/ios_rule_script（上游，2026-10-28 起冻结，2026 年底停更）
 #         → filter 脚本（scripts/，kiki 开源，原样引入）
 #         → mihomo convert-ruleset 转 MRS
 #         → commit 到本仓库 rules/
 # kiki 已从链条中摘除。ACL4SSR 的 3 个文件沿用直接同步（kiki 也不产它们）。
 #
+# 例外（自聚合，不走 BM7）：AdvertisingLite 与 Privacy 由
+# scripts/aggregate-ads.py 从 ACL4SSR + skk.moe + anti-AD + NobyDa
+# 多源聚合（方案 C 第一步，2026-11-13）。filter-alibaba.py 的逻辑
+# 已内嵌进聚合脚本，workflow 不再单独调用它。
+#
+# 例外（meta-rules-dat，不走 BM7）：12 个服务类 MRS 由
+# scripts/build-services.py 从 MetaCubeX/meta-rules-dat 的 BundleMRS.7z
+# 取 geosite 数据（方案 C 第二步，2026-11-13）。supplements/ 下的
+# 3 个小文件补 geosite 缺的条目（iCloud 9 条、Microsoft 1 条、Threads 1 条）。
+# filter-icloud.py、filter_*.py、sync-threads.py 不再被 workflow 调用，保留在仓库中。
+#
+# 冻结（BM7 最后一版，不再重建，文件保留在 rules/ 中）：
+# Apple.yaml（classical：关键词 + IP 段，稳定）、Netflix_IP.mrs
+# （QiuSimons 1,119 条 CIDR，geoip netflix 仅 122 条）、Copilot_Domain.mrs
+# 与 Copilot_IP.mrs（走 Microsoft 组，核心域名已被 geosite microsoft 覆盖）、
+# ChinaMax 三件套（方案 C 第三步，2026-11-13：国内域名与 IP 段稳定；
+# ChinaMax_IP 含 5,098 条 CDN 任播前缀，纯 geoip cn 覆盖不到，冻结更稳）。
+# 自此 workflow 不再从 blackmatrix7 拉取任何文件。
+#
 # 放置：仓库 .github/workflows/update-rules.yml
-# 依赖：仓库 scripts/ 下的 13 个 filter 脚本 + sync-threads.py
+# 依赖：仓库 scripts/ 下的 filter 脚本 + sync-threads.py + aggregate-ads.py
+#       + build-services.py；supplements/ 下的 3 个补充文件
 # 手动触发：Actions 页 "Run workflow"
 # ============================================================
 
@@ -31,7 +51,7 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Prepare directories
-        run: mkdir -p rules .tmp/rules
+        run: mkdir -p rules .tmp
 
       - name: Download mihomo
         run: |
@@ -45,32 +65,38 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install PyYAML
-        run: python -m pip install PyYAML==6.0.2
+      - name: Install Python deps
+        run: python -m pip install PyYAML==6.0.2 py7zr==1.0.0
 
-      # ---------------- 上游源（blackmatrix7） ----------------
-      - name: Download upstream sources
+      # ---------------- 服务类源（meta-rules-dat BundleMRS） ----------------
+      - name: Download meta-rules-dat BundleMRS
         run: |
           set -euo pipefail
-          B=https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash
-          cd .tmp/rules
-          for p in \
-            Apple/Apple.yaml Apple/Apple_Domain.yaml \
-            iCloud/iCloud.yaml \
-            Privacy/Privacy.yaml Privacy/Privacy_Domain.yaml \
-            ChinaMax/ChinaMax.yaml \
-            AdvertisingLite/AdvertisingLite.yaml AdvertisingLite/AdvertisingLite_Domain.yaml \
-            Netflix/Netflix.yaml Netflix/Netflix_IP.yaml \
-            TikTok/TikTok.yaml YouTube/YouTube.yaml Spotify/Spotify.yaml \
-            Amazon/Amazon.yaml Google/Google.yaml OpenAI/OpenAI.yaml \
-            Microsoft/Microsoft.yaml Copilot/Copilot.yaml Emby/Emby.yaml; do
-            d=$(dirname "$p"); mkdir -p "$d"
-            curl -fsSL --retry 3 -o "$p" "$B/$p" && echo "ok $p"
+          curl -fsSL --retry 3 -o .tmp/BundleMRS.7z \
+            https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/BundleMRS.7z \
+            && echo "ok BundleMRS.7z ($(stat -c%s .tmp/BundleMRS.7z) bytes)"
+
+      # ---------------- 广告/隐私源（自聚合，不走 BM7） ----------------
+      - name: Download ad/privacy sources
+        run: |
+          set -euo pipefail
+          mkdir -p .tmp/ads
+          cd .tmp/ads
+          A=https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash
+          for f in BanEasyPrivacy.list BanAD.list BanEasyList.list BanEasyListChina.list; do
+            curl -fsSL --retry 3 -o "$f" "$A/$f" && echo "ok $f"
           done
-          curl -fsSL --retry 3 -o ChinaMax_Domain.txt "$B/ChinaMax/ChinaMax_Domain.txt" \
-            && echo "ok ChinaMax_Domain.txt"
-          curl -fsSL --retry 3 -o ChinaMax_IP.txt "$B/ChinaMax/ChinaMax_IP.txt" \
-            && echo "ok ChinaMax_IP.txt"
+          curl -fsSL --retry 3 -o reject-drop.conf \
+            https://ruleset.skk.moe/List/non_ip/reject-drop.conf && echo "ok reject-drop.conf"
+          curl -fsSL --retry 3 -o reject-no-drop.conf \
+            https://ruleset.skk.moe/List/non_ip/reject-no-drop.conf && echo "ok reject-no-drop.conf"
+          curl -fsSL --retry 3 -o anti-ad-domains.txt \
+            https://raw.githubusercontent.com/privacy-protection-tools/anti-AD/master/anti-ad-domains.txt \
+            && echo "ok anti-ad-domains.txt"
+          curl -fsSL --retry 3 -o NobyDa-AD_Block.txt \
+            https://raw.githubusercontent.com/NobyDa/ND-AD/master/Surge/AD_Block.txt \
+            && echo "ok NobyDa-AD_Block.txt"
+          cd ../..
 
       # ---------------- ACL4SSR（直接同步，不经转制） ----------------
       - name: Sync ACL4SSR MRS
@@ -83,114 +109,29 @@ jobs:
           done
           cd ..
 
-      # ---------------- Apple / iCloud 分离 ----------------
-      - name: Split iCloud from Apple
-        run: |
-          set -euo pipefail
-          python3 scripts/filter-icloud.py \
-            .tmp/rules/iCloud/iCloud.yaml \
-            .tmp/rules/Apple/Apple.yaml \
-            rules/Apple.yaml \
-            .tmp/rules/Apple/Apple_Domain.yaml \
-            .tmp/rules/Apple_Domain_Filtered.yaml \
-            .tmp/rules/iCloud_Domain.txt
-          ./mihomo convert-ruleset domain yaml \
-            .tmp/rules/Apple_Domain_Filtered.yaml rules/Apple_Domain.mrs
-          ./mihomo convert-ruleset domain text \
-            .tmp/rules/iCloud_Domain.txt rules/iCloud.mrs
-
-      # ---------------- 阿里 CDN 误杀过滤 ----------------
-      - name: Filter Alibaba false positives
-        run: |
-          set -euo pipefail
-          python3 scripts/filter-alibaba.py \
-            .tmp/rules/AdvertisingLite/AdvertisingLite_Domain.yaml \
-            .tmp/rules/AdvertisingLite/AdvertisingLite.yaml
-          cp .tmp/rules/AdvertisingLite/AdvertisingLite.yaml rules/AdvertisingLite.yaml
-          ./mihomo convert-ruleset domain yaml \
-            .tmp/rules/AdvertisingLite/AdvertisingLite_Domain.yaml \
-            rules/AdvertisingLite_Domain.mrs
-
-      # ---------------- Privacy / ChinaMax ----------------
-      - name: Build Privacy and ChinaMax
-        run: |
-          set -euo pipefail
-          cp .tmp/rules/Privacy/Privacy.yaml rules/Privacy.yaml
-          ./mihomo convert-ruleset domain yaml \
-            .tmp/rules/Privacy/Privacy_Domain.yaml rules/Privacy_Domain.mrs
-          cp .tmp/rules/ChinaMax/ChinaMax.yaml rules/ChinaMax.yaml
-          python3 - .tmp/rules/ChinaMax_Domain.txt .tmp/rules/ChinaMax_IP.txt <<'PY'
-          import sys
-          from pathlib import Path
-          # ChinaMax_Domain 去掉 browserleaks
-          pd = Path(sys.argv[1])
-          out = []
-          for l in pd.read_text(encoding="utf-8").splitlines():
-              s = l.strip()
-              if not s or s.startswith("#"):
-                  out.append(l); continue
-              d = s.lower().rstrip(".")
-              if d.startswith("+."): d = d[2:]
-              if d == "browserleaks.com" or d.endswith(".browserleaks.com"):
-                  continue
-              out.append(l)
-          pd.write_text("\n".join(out) + "\n", encoding="utf-8")
-          # ChinaMax_IP 去掉独立 ASN 132203
-          pi = Path(sys.argv[2])
-          out = [l for l in pi.read_text(encoding="utf-8").splitlines()
-                 if l.strip().strip("'\"") != "132203"]
-          pi.write_text("\n".join(out) + "\n", encoding="utf-8")
-          print("chinamax cleaned")
-          PY
-          ./mihomo convert-ruleset domain text \
-            .tmp/rules/ChinaMax_Domain.txt rules/ChinaMax_Domain.mrs
-          ./mihomo convert-ruleset ipcidr text \
-            .tmp/rules/ChinaMax_IP.txt rules/ChinaMax_IP.mrs
-
-      # ---------------- 服务类：过滤 + 转 MRS ----------------
+      # ---------------- 服务类：meta-rules-dat geosite + 转 MRS ----------------
       - name: Build service rules
         run: |
           set -euo pipefail
-          T=.tmp/rules
-          python3 scripts/filter_netflix.py $T/Netflix/Netflix.yaml $T/Netflix_Domain.txt
-          ./mihomo convert-ruleset domain text $T/Netflix_Domain.txt rules/Netflix_Domain.mrs
+          python3 scripts/build-services.py \
+            --bundle-7z .tmp/BundleMRS.7z \
+            --supplements supplements \
+            --mihomo ./mihomo \
+            --out rules/ \
+            --tmp .tmp/services
 
-          python3 scripts/filter_netflix_ip.py $T/Netflix/Netflix_IP.yaml $T/Netflix_IP_Filtered.yaml
-          ./mihomo convert-ruleset ipcidr yaml $T/Netflix_IP_Filtered.yaml rules/Netflix_IP.mrs
-
-          python3 scripts/filter_tiktok.py $T/TikTok/TikTok.yaml $T/TikTok_Domain.txt
-          ./mihomo convert-ruleset domain text $T/TikTok_Domain.txt rules/TikTok_Domain.mrs
-
-          python3 scripts/filter_youtube.py $T/YouTube/YouTube.yaml $T/YouTube_Domain.txt
-          ./mihomo convert-ruleset domain text $T/YouTube_Domain.txt rules/YouTube_Domain.mrs
-
-          python3 scripts/filter_spotify.py $T/Spotify/Spotify.yaml $T/Spotify_Domain.txt
-          ./mihomo convert-ruleset domain text $T/Spotify_Domain.txt rules/Spotify_Domain.mrs
-
-          python3 scripts/filter_amazon.py $T/Amazon/Amazon.yaml $T/Amazon_Domain.txt
-          ./mihomo convert-ruleset domain text $T/Amazon_Domain.txt rules/Amazon_Domain.mrs
-
-          python3 scripts/filter_google.py $T/Google/Google.yaml $T/Google_Domain.txt
-          ./mihomo convert-ruleset domain text $T/Google_Domain.txt rules/Google_Domain.mrs
-
-          python3 scripts/filter_openai.py $T/OpenAI/OpenAI.yaml $T/OpenAI_Domain.txt
-          ./mihomo convert-ruleset domain text $T/OpenAI_Domain.txt rules/OpenAI_Domain.mrs
-
-          python3 scripts/filter-microsoft.py $T/Microsoft/Microsoft.yaml $T/Microsoft_Domain.txt
-          ./mihomo convert-ruleset domain text $T/Microsoft_Domain.txt rules/Microsoft.mrs
-
-          python3 scripts/filter-copilot.py $T/Copilot/Copilot.yaml $T/Copilot_Domain.txt $T/Copilot_IP.txt
-          ./mihomo convert-ruleset domain text $T/Copilot_Domain.txt rules/Copilot_Domain.mrs
-          ./mihomo convert-ruleset ipcidr text $T/Copilot_IP.txt rules/Copilot_IP.mrs
-
-          python3 scripts/filter-emby.py $T/Emby/Emby.yaml $T/Emby_Domain.txt
-          ./mihomo convert-ruleset domain text $T/Emby_Domain.txt rules/Emby.mrs
-
-      # ---------------- Threads（blackmatrix7 + 本地补充） ----------------
-      - name: Build Threads
+      # ---------------- 广告/隐私：自聚合 + 转 MRS ----------------
+      - name: Aggregate ad/privacy lists
         run: |
           set -euo pipefail
-          python3 scripts/sync-threads.py ./mihomo rules/
+          python3 scripts/aggregate-ads.py --src .tmp/ads --out .tmp/ads-out \
+            --with-anti-ad --with-nobyda
+          cp .tmp/ads-out/Privacy.yaml rules/Privacy.yaml
+          cp .tmp/ads-out/AdvertisingLite.yaml rules/AdvertisingLite.yaml
+          ./mihomo convert-ruleset domain yaml \
+            .tmp/ads-out/Privacy_Domain.yaml rules/Privacy_Domain.mrs
+          ./mihomo convert-ruleset domain yaml \
+            .tmp/ads-out/AdvertisingLite_Domain.yaml rules/AdvertisingLite_Domain.mrs
 
       # ---------------- 校验 ----------------
       - name: Sanity check
