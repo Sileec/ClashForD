@@ -330,6 +330,10 @@ rules:
 - DOMAIN-SUFFIX,smoot.apple.com,Apple
 - DOMAIN-SUFFIX,gspe1-ssl.ls.apple.com,Apple
 - DOMAIN-SUFFIX,cp4.cloudflare.com,Apple
+# PCC 显式钉住（原仅靠 geosite Apple_Domain 覆盖；ss-cleanup 节点在 app.apple.com 子域内）
+- DOMAIN-SUFFIX,issuer.apple.com,Apple
+- DOMAIN-SUFFIX,ropes.apple.com,Apple
+- DOMAIN-SUFFIX,app.apple.com,Apple
 # 以下规则为广告规则集误匹配，因此需放在广告规则集之前
 - DOMAIN,hatch.metaaivm.com,Meta
 - DOMAIN,statsig.anthropic.com,Claude
