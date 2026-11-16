@@ -143,7 +143,15 @@ jobs:
           fi
           ls -la rules/
 
-      # ---------------- 清理并提交 ----------------
+            # ---------------- 配置体检（Config Doctor） ----------------
+                  - name: Config doctor
+                          run: |
+                                    python3 scripts/config_doctor.py \
+                                                --config config/whisper-scheme-selfhost.yaml \
+                                                            --rules rules/ \
+                                                                        --mihomo ./mihomo
+                                                                        
+                                                                        # ---------------- 清理并提交 ----------------
       - name: Cleanup and commit
         run: |
           rm -rf .tmp mihomo
