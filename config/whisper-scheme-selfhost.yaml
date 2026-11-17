@@ -393,10 +393,16 @@ rules:
 - DOMAIN-SUFFIX,deepmind.google,Gemini
 - DOMAIN-SUFFIX,gemini.googleusercontent.com,Gemini
 - DOMAIN-SUFFIX,makersuite.google.com,Gemini
+- DOMAIN-SUFFIX,generativelanguage.googleapis.com,Gemini
+- DOMAIN-SUFFIX,geminiweb-pa.clients6.google.com,Gemini
+- DOMAIN-SUFFIX,notebooklm.google.com,Gemini
 - DOMAIN-SUFFIX,claude.ai,Claude
 - DOMAIN-SUFFIX,anthropic.com,Claude
 - DOMAIN-SUFFIX,claudeusercontent.com,Claude
 - DOMAIN-SUFFIX,claudeusercontent.com.cdn.cloudflare.net,Claude
+- DOMAIN-SUFFIX,claude.com,Claude
+- DOMAIN-SUFFIX,claude.app,Claude
+- DOMAIN-SUFFIX,modelcontextprotocol.io,Claude
 - DOMAIN-SUFFIX,grok.com,Grok
 - DOMAIN-SUFFIX,x.ai,Grok
 - DOMAIN-KEYWORD,grok,Grok
@@ -497,6 +503,10 @@ rules:
 - DOMAIN-SUFFIX,tdesktop.com,Telegram
 - DOMAIN-SUFFIX,telegra.ph,Telegram
 - DOMAIN-SUFFIX,telegram.dog,Telegram
+- DOMAIN-SUFFIX,telegram-cdn.org,Telegram
+- DOMAIN-SUFFIX,cdn-telegram.org,Telegram
+- DOMAIN-SUFFIX,fragment.com,Telegram
+- DOMAIN-SUFFIX,ton.org,Telegram
 - IP-CIDR,91.108.4.0/22,Telegram,no-resolve
 - IP-CIDR,91.108.8.0/22,Telegram,no-resolve
 - IP-CIDR,91.108.12.0/22,Telegram,no-resolve
