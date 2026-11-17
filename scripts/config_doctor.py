@@ -314,7 +314,7 @@ def main() -> int:
     checks.append(c8)
     if args.mihomo:
         c9 = Check("9 geosite Apple_Domain 漂移（WARN）")
-        check_mrs_pcc_drift(Path(args.rules), Path(args.mihomo), c9)
+        check_mrs_pcc_drift(Path(args.rules), Path(args.mihomo).resolve(), c9)
         checks.append(c9)
 
     n_fail = n_warn = 0
