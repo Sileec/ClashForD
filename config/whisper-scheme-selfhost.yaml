@@ -530,6 +530,9 @@ rules:
 - DOMAIN-SUFFIX,ooklaserver.net,Speedtest
 - DOMAIN-SUFFIX,ookla.net,Speedtest
 - DOMAIN-SUFFIX,speedtestcustom.com,Speedtest
+- DOMAIN,whoami.akamai.net,PROXY-Gate
+- DOMAIN,whatismyip.akamai.com,PROXY-Gate
+- DOMAIN-SUFFIX,browserleaks.com,PROXY-Gate
 - RULE-SET,ChinaMax,DIRECT
 - RULE-SET,ChinaMax_Domain,DIRECT
 - RULE-SET,ChinaMax_IP,DIRECT
