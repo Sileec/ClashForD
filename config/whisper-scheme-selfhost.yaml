@@ -59,23 +59,25 @@ dns:
     - 240.0.0.0/4
     - 127.0.0.0/8
     - 0.0.0.0/32
+  fake-ip-filter-mode: rule
   fake-ip-filter:
-  - geosite:cn
-  - '*.lan'
-  - '*.local'
-  - localhost
-  - '*.msftconnecttest.com'
-  - '*.msftncsi.com'
-  - '*.msidentity.com'
-  - captive.apple.com
-  - '*.push.apple.com'
-  - stun.*
-  - +.stun.*.*
-  - +.stun.*.*.*
-  - +.stun.*.*.*.*
-  - +.stun.*.*.*.*.*
-  - speedtest.net
-  - +.r2.cloudflarestorage.com
+    - DOMAIN,whoami.akamai.net,fake-ip
+    - DOMAIN,whatismyip.akamai.com,fake-ip
+    - DOMAIN-SUFFIX,browserleaks.com,fake-ip
+    - GEOSITE,cn,real-ip
+    - DOMAIN-WILDCARD,*.lan,real-ip
+    - DOMAIN-WILDCARD,*.local,real-ip
+    - DOMAIN,localhost,real-ip
+    - DOMAIN-WILDCARD,*.msftconnecttest.com,real-ip
+    - DOMAIN-WILDCARD,*.msftncsi.com,real-ip
+    - DOMAIN-WILDCARD,*.msidentity.com,real-ip
+    - DOMAIN,captive.apple.com,real-ip
+    - DOMAIN-WILDCARD,*.push.apple.com,real-ip
+    - DOMAIN-WILDCARD,stun.*,real-ip
+    - DOMAIN-REGEX,^(.+\.)?stun(\.[^.]+){2,}$,real-ip
+    - DOMAIN,speedtest.net,real-ip
+    - DOMAIN-SUFFIX,r2.cloudflarestorage.com,real-ip
+    - MATCH,fake-ip
 profile:
   store-selected: true
   store-fake-ip: true
