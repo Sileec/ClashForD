@@ -1,11 +1,11 @@
 # NAME: AdvertisingLite
 # AUTHOR: Sileec/ClashForD (self-aggregated)
-# UPDATED: 2026-11-16 00:52:02
+# UPDATED: 2026-11-18 02:48:41
 # SOURCES: BanAD.list, BanEasyList.list, BanEasyListChina.list, anti-ad-domains.txt, NobyDa-AD_Block.txt
 # DOMAIN-KEYWORD: 24
-# DOMAIN-SUFFIX: 154771
+# DOMAIN-SUFFIX: 154579
 # IP-CIDR: 109
-# TOTAL: 154904
+# TOTAL: 154712
 payload:
   - DOMAIN-KEYWORD,admarvel
   - DOMAIN-KEYWORD,admaster
