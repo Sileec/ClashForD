@@ -195,8 +195,24 @@ def check_no_quic_block(rules, check: Check):
 
 
 def check_fake_ip_filter(data, check: Check):
-    filt = (data.get("dns") or {}).get("fake-ip-filter") or []
-    if any(item in filt for item in FAKE_IP_REQUIRED):
+    dns = data.get("dns") or {}
+    filt = dns.get("fake-ip-filter") or []
+    mode = dns.get("fake-ip-filter-mode", "blacklist")
+    if mode == "rule":
+        # rule 模式：条目是 "TYPE,pattern,action"，要求 push.apple.com 通配/后缀规则动作是 real-ip
+        ok = False
+        for item in filt:
+            parts = [p.strip() for p in str(item).split(",")]
+            if len(parts) >= 3 and parts[2] == "real-ip":
+                if (parts[0] == "DOMAIN-WILDCARD" and parts[1] == "*.push.apple.com") or \
+                   (parts[0] == "DOMAIN-SUFFIX" and parts[1] == "push.apple.com"):
+                    ok = True
+                    break
+        if ok:
+            check.ok("fake-ip-filter（rule 模式）含 push.apple.com real-ip 规则")
+        else:
+            check.fail("fake-ip-filter（rule 模式）缺少 push.apple.com real-ip 规则（APNs 推送可能被 Fake-IP 误伤）")
+    elif any(item in filt for item in FAKE_IP_REQUIRED):
         check.ok("fake-ip-filter 含 push.apple.com")
     else:
         check.fail("fake-ip-filter 缺少 *.push.apple.com（APNs 推送可能被 Fake-IP 误伤）")
