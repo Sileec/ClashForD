@@ -1,13 +1,13 @@
 # NAME: Privacy
 # AUTHOR: Sileec/ClashForD (self-aggregated)
-# UPDATED: 2026-11-21 02:02:08
+# UPDATED: 2026-11-22 01:03:54
 # SOURCES: BanEasyPrivacy.list, reject-drop.conf, reject-no-drop.conf
-# DOMAIN: 11
+# DOMAIN: 10
 # DOMAIN-KEYWORD: 2
-# DOMAIN-SUFFIX: 39888
+# DOMAIN-SUFFIX: 40365
 # DOMAIN-WILDCARD: 8
 # IP-CIDR: 9
-# TOTAL: 39918
+# TOTAL: 40394
 payload:
   - DOMAIN-KEYWORD,-p2p-v2.pull.yximgs.com
   - DOMAIN-KEYWORD,-p2p.pull.yximgs.com
